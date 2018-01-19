@@ -16,7 +16,6 @@ Contents:
    log.rst
    error.rst
    unique_token.rst
-   migration.rst
    frameworks.rst
 
 Indices and tables

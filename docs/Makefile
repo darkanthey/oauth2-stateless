@@ -85,17 +85,17 @@ qthelp:
 	@echo
 	@echo "Build finished; now you can run "qcollectiongenerator" with the" \
 	      ".qhcp project file in $(BUILDDIR)/qthelp, like this:"
-	@echo "# qcollectiongenerator $(BUILDDIR)/qthelp/python-oauth2.qhcp"
+	@echo "# qcollectiongenerator $(BUILDDIR)/qthelp/oauth2-stateless.qhcp"
 	@echo "To view the help file:"
-	@echo "# assistant -collectionFile $(BUILDDIR)/qthelp/python-oauth2.qhc"
+	@echo "# assistant -collectionFile $(BUILDDIR)/qthelp/oauth2-stateless.qhc"
 
 devhelp:
 	$(SPHINXBUILD) -b devhelp $(ALLSPHINXOPTS) $(BUILDDIR)/devhelp
 	@echo
 	@echo "Build finished."
 	@echo "To view the help file:"
-	@echo "# mkdir -p $$HOME/.local/share/devhelp/python-oauth2"
-	@echo "# ln -s $(BUILDDIR)/devhelp $$HOME/.local/share/devhelp/python-oauth2"
+	@echo "# mkdir -p $$HOME/.local/share/devhelp/oauth2-stateless"
+	@echo "# ln -s $(BUILDDIR)/devhelp $$HOME/.local/share/devhelp/oauth2-stateless"
 	@echo "# devhelp"
 
 epub:

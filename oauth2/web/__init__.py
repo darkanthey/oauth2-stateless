@@ -67,7 +67,7 @@ class UserFacingSiteAdapter(object):
 
     def user_has_denied_access(self, request):
         """
-        Checks if the user has denied access. This will lead to python-oauth2
+        Checks if the user has denied access. This will lead to oauth2-stateless
         returning a "acess_denied" response to the requesting client app.
 
         :param request: Incoming request data.

@@ -14,28 +14,28 @@ from flask import request
 class Request(object):
     """Contains data of the current HTTP request."""
 
-    def __init__(self, request: request) -> None:
+    def __init__(self, request):
         self.request = request
 
     @property
-    def method(self) -> str:
+    def method(self):
         return self.request.method
 
     @property
-    def path(self) -> str:
+    def path(self):
         return self.request.path
 
     @property
-    def query_string(self) -> Dict[str, str]:
+    def query_string(self):
         return self.request.query_string
 
-    def get_param(self, name: str, default: Optional[str]=None) -> Optional[str]:
+    def get_param(self, name, default):
         return self.request.args.get(name, default)
 
-    def post_param(self, name: str, default: Optional[str]=None) -> Optional[str]:
+    def post_param(self, name, default):
         return self.request.form.get(name, default)
 
-    def header(self, name: str, default: Optional[str]=None) -> Optional[str]:
+    def header(self, name, default):
         return self.request.headers.get(name, default)
 
 
