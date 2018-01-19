@@ -1,0 +1,23 @@
+# IDE
+.project
+.pydevproject
+.idea/
+.settings/
+
+# Python
+*.pyc
+*.egg-info/
+dist/
+build/
+_build/
+__pycache__
+
+# coverage
+.coverage
+cover/
+
+# Vagrant
+.vagrant/
+Berksfile.lock
+cookbooks/
+Gemfile.lock
