@@ -4,11 +4,9 @@ Provides various implementations of algorithms to generate an Access Token or Re
 
 import hashlib
 import os
-import time
 import uuid
 
 import itsdangerous
-
 from oauth2.error import AccessTokenNotFound
 
 
@@ -116,6 +114,11 @@ class StatelessTokenGenerator(TokenGenerator):
         :return: A new token
         :rtype: str
         """
+        # We use the same generator for code and access_token
+        # JWT will return the same code for different user
+        if user_id is None:
+            return str(uuid.uuid4())
+
         return self.json_serialize(dict(type='access_token', grant_type=grant_type, user_id=user_id, data=data,
                                         scopes=scopes, client_id=client_id))
 

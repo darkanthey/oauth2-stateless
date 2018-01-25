@@ -1,7 +1,6 @@
 from copy import copy
 
 from mock import Mock, call, patch
-
 from oauth2 import Provider
 from oauth2.client_authenticator import ClientAuthenticator
 from oauth2.compatibility import quote
@@ -15,7 +14,7 @@ from oauth2.grant import (AuthorizationCodeAuthHandler, AuthorizationCodeGrant,
                           ClientCredentialsHandler, ImplicitGrant,
                           ImplicitGrantHandler, RefreshToken,
                           RefreshTokenHandler, ResourceOwnerGrant,
-                          ResourceOwnerGrantHandler, Scope, SiteAdapterMixin)
+                          ResourceOwnerGrantHandler, Scope)
 from oauth2.store import AccessTokenStore, AuthCodeStore, ClientStore
 from oauth2.test import unittest
 from oauth2.tokengenerator import TokenGenerator

@@ -10,7 +10,10 @@ setup(name="oauth2-stateless",
       author_email="darkanthey@gmail.com",
       url="https://github.com/darkanthey/oauth2-stateless",
       packages=[d[0].replace("/", ".") for d in os.walk("oauth2") if not d[0].endswith("__pycache__")],
-      install_requires=["itsdangerous"],
+      install_requires=[
+          "ujson",
+          "itsdangerous"
+      ],
       extras_require={
           "memcache": ["python-memcached"],
           "mongodb": ["pymongo"],

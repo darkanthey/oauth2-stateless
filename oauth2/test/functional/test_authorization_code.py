@@ -7,7 +7,7 @@ from oauth2 import Provider
 from oauth2.grant import AuthorizationCodeGrant, RefreshToken
 from oauth2.test import unittest
 from oauth2.test.functional import NoLoggingHandler
-from oauth2.tokengenerator import Uuid4TokenGeneratox
+from oauth2.tokengenerator import Uuid4TokenGenerator
 from oauth2.web import AuthorizationCodeGrantSiteAdapter
 from oauth2.web.wsgi import Application
 from tornado.ioloop import IOLoop
