@@ -29,13 +29,13 @@ class Request(object):
     def query_string(self):
         return self.request.query_string
 
-    def get_param(self, name, default):
+    def get_param(self, name, default=None):
         return self.request.args.get(name, default)
 
-    def post_param(self, name, default):
+    def post_param(self, name, default=None):
         return self.request.form.get(name, default)
 
-    def header(self, name, default):
+    def header(self, name, default=None):
         return self.request.headers.get(name, default)
 
 
