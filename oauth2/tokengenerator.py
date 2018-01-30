@@ -49,12 +49,15 @@ class TokenGenerator(object):
 
         return result
 
-    def generate(self, data=None, scopes=None, user_id=None, client_id=None):
+    def generate(self, grant_type=None, data=None, scopes=None, user_id=None, client_id=None):
         """
         Implemented by generators extending this base class.
 
+        :param grant_type: Identifier token grant_type
+        :type grant_type: str
         :param data: Arbitrary data as returned by the ``authenticate()`` method of a ``SiteAdapter``.
         :type data: dict
+        :param scopes: scopes for oauth session
         :type scopes: dict
         :param user_id: Identifier of the current user as returned by the ``authenticate()`` method of a ``SiteAdapter``
         :type user_id: int
@@ -65,12 +68,15 @@ class TokenGenerator(object):
         """
         raise NotImplementedError
 
-    def refresh_generate(self, data=None, scopes=None, user_id=None, client_id=None):
+    def refresh_generate(self, grant_type=None, data=None, scopes=None, user_id=None, client_id=None):
         """
         Implemented by refresh generators extending this base class.
 
+        :param grant_type: Identifier token grant_type
+        :type grant_type: str
         :param data: Arbitrary data as returned by the ``authenticate()`` method of a ``SiteAdapter``.
         :type data: dict
+        :param scopes: scopes for oauth session
         :type scopes: dict
         :param user_id: Identifier of the current user as returned by the ``authenticate()`` method of a ``SiteAdapter``
         :type user_id: int
@@ -116,8 +122,7 @@ class StatelessTokenGenerator(TokenGenerator):
         """
         # We use the same generator for code and access_token
         # JWT will return the same code for different user
-        if user_id is None:
-            return str(uuid.uuid4())
+        user_id = user_id if user_id else str(uuid.uuid4())
 
         return self.json_serialize(dict(type='access_token', grant_type=grant_type, user_id=user_id, data=data,
                                         scopes=scopes, client_id=client_id))

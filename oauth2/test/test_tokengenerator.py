@@ -11,13 +11,11 @@ class StatelessTokenGeneratorTestCase(unittest.TestCase):
         self.refresh_token_len_with_grant_type = 102
 
     def test_create_code_token_data_no_expiration(self):
-        code_token_len = 36
         generator = StatelessTokenGenerator(self.sekret_key)
 
         result = generator.create_access_token_data(data=None, scopes=None, grant_type='test_grant_type',
                                                     user_id=None, client_id=None)
 
-        self.assertEqual(len(result["access_token"]), code_token_len)
         self.assertEqual(result["token_type"], "Bearer")
 
     def test_check_access_token_for_diff_secret_key(self):
@@ -36,7 +34,6 @@ class StatelessTokenGeneratorTestCase(unittest.TestCase):
         self.assertNotEqual(result["access_token"], result1["access_token"])
 
     def test_create_code_token_data_with_expiration(self):
-        code_token_len = 36
         generator = StatelessTokenGenerator(self.sekret_key)
 
         generator.expires_in = {'test_grant_type': 600}
@@ -44,7 +41,6 @@ class StatelessTokenGeneratorTestCase(unittest.TestCase):
         result = generator.create_access_token_data(data=None, scopes=None, grant_type='test_grant_type',
                                                     user_id=None, client_id=None)
 
-        self.assertEqual(len(result["access_token"]), code_token_len)
         self.assertEqual(result["token_type"], "Bearer")
         self.assertEqual(len(result["refresh_token"]), self.refresh_token_len_with_grant_type)
         self.assertEqual(result["expires_in"], 600)
@@ -81,7 +77,6 @@ class StatelessTokenGeneratorTestCase(unittest.TestCase):
         self.assertEqual(result_token["user_id"], result1_token["user_id"])
 
     def test_create_code_token_data_with_expiration_scopes(self):
-        code_token_len = 36
         generator = StatelessTokenGenerator(self.sekret_key)
 
         generator.expires_in = {'test_grant_type': 600}
@@ -89,7 +84,6 @@ class StatelessTokenGeneratorTestCase(unittest.TestCase):
         result = generator.create_access_token_data(data=None, scopes=None, grant_type='test_grant_type',
                                                     user_id=None, client_id=None)
 
-        self.assertEqual(len(result["access_token"]), code_token_len)
         self.assertEqual(result["token_type"], "Bearer")
         self.assertEqual(len(result["refresh_token"]), self.refresh_token_len_with_grant_type)
         self.assertEqual(result["expires_in"], 600)
