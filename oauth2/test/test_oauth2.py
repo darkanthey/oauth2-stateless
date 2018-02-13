@@ -91,28 +91,32 @@ class ProviderTestCase(unittest.TestCase):
 
         result = self.auth_server.dispatch(request_mock, {})
 
-        self.response_mock.add_header.assert_called_with("Content-Type",
-                                                         "application/json")
+        self.response_mock.add_header.assert_called_with("Content-Type", "application/json")
         self.assertEqual(self.response_mock.status_code, 400)
         self.assertEqual(self.response_mock.body, json.dumps(error_body))
         self.assertEqual(result, self.response_mock)
 
     def test_dispatch_no_client_found(self):
+        error_body = {
+            "error": "invalid_redirect_uri",
+            "error_description": "Invalid redirect URI"
+        }
+
         request_mock = Mock(spec=Request)
 
         grant_handler_mock = Mock(spec=GrantHandler)
-        grant_handler_mock.process.side_effect = OAuthInvalidNoRedirectError(
-            error="")
+        grant_handler_mock.process.side_effect = OAuthInvalidNoRedirectError(error="")
 
         grant_factory_mock = Mock(return_value=grant_handler_mock)
 
         self.auth_server.add_grant(grant_factory_mock)
-        self.auth_server.dispatch(request_mock, {})
+        result = self.auth_server.dispatch(request_mock, {})
 
-        self.response_mock.add_header.assert_called_with("Content-Type",
-                                                         "text/plain")
+        self.response_mock.add_header.assert_called_with("Content-Type", "application/json")
         self.assertEqual(self.response_mock.status_code, 400)
-        self.assertEqual(self.response_mock.body, "")
+        self.assertEqual(self.response_mock.body, json.dumps(error_body))
+
+        self.assertEqual(result, self.response_mock)
 
     def test_dispatch_general_exception(self):
         request_mock = Mock(spec=Request)
