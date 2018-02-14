@@ -3,7 +3,7 @@ import os
 from setuptools import setup
 
 setup(name="oauth2-stateless",
-      version='1.0.0',
+      version='1.0.1',
       description="OAuth 2.0 provider for python with Stateless tokens support",
       long_description=open("README.rst").read(),
       author="Andrew Grytsenko",
@@ -20,7 +20,7 @@ setup(name="oauth2-stateless",
           "redis": ["redis"]
       },
       classifiers=[
-          "Development Status :: 3 - Alpha",
+          "Development Status :: 3 - Beta",
           "License :: OSI Approved :: MIT License",
           "Programming Language :: Python :: 2",
           "Programming Language :: Python :: 2.7",

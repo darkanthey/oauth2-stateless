@@ -1,3 +1,11 @@
+## 1.0.1
+
+Bugfixes:
+
+  - Some oauth implementations have 'Content-Type: application/json' for oauth/token.
+  - Fix an exception when requesting an unknown URL on Python 3.x
+  - Add error message to response for bad redirect URIs.
+
 ## 1.0.0
 
 Features:

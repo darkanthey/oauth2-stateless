@@ -33,6 +33,8 @@ class Request(object):
         return self.request.args.get(name, default)
 
     def post_param(self, name, default=None):
+        if self.header('Content-Type') == 'application/json':
+            return self.request.json.get(name, default)
         return self.request.form.get(name, default)
 
     def header(self, name, default=None):
