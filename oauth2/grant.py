@@ -26,15 +26,9 @@ So there are two remaining parties:
 * The client that wants to access a resource.
 * The server that issues the access.
 """
-
-try:
-    import json
-except ImportError:
-    import ujson as json
-
 import time
 
-from oauth2.compatibility import quote, urlencode
+from oauth2.compatibility import json, quote, urlencode
 from oauth2.datatype import AccessToken, AuthorizationCode
 from oauth2.error import (AccessTokenNotFound, AuthCodeNotFound,
                           InvalidSiteAdapter, OAuthInvalidError,
@@ -107,11 +101,7 @@ class Scope(object):
         self.scopes = []
         self.send_back = False
 
-        if isinstance(available, list):
-            self.available_scopes = available
-        else:
-            self.available_scopes = []
-
+        self.available_scopes = available if isinstance(available, list) else []
         self.default = default
 
     def compare(self, previous_scopes):
@@ -276,7 +266,6 @@ class AuthorizeMixin(object):
 
     def __init__(self, site_adapter, **kwargs):
         self.site_adapter = site_adapter
-
         super(AuthorizeMixin, self).__init__(**kwargs)
 
     def authorize(self, request, response, environ, scopes):
@@ -381,7 +370,6 @@ class SiteAdapterMixin(object):
             )
 
         self.site_adapter = site_adapter
-
         super(SiteAdapterMixin, self).__init__(**kwargs)
 
 
@@ -394,7 +382,6 @@ class AuthorizationCodeAuthHandler(AuthorizeMixin, AuthRequestMixin, GrantHandle
 
     def __init__(self, auth_token_store, **kwargs):
         self.auth_code_store = auth_token_store
-
         super(AuthorizationCodeAuthHandler, self).__init__(**kwargs)
 
     def process(self, request, response, environ):
@@ -632,7 +619,6 @@ class ImplicitGrant(GrantHandlerFactory, ScopeGrant, SiteAdapterMixin):
 class ImplicitGrantHandler(AuthorizeMixin, AuthRequestMixin, GrantHandler):
     def __init__(self, access_token_store, **kwargs):
         self.access_token_store = access_token_store
-
         super(ImplicitGrantHandler, self).__init__(**kwargs)
 
     def process(self, request, response, environ):
@@ -699,7 +685,6 @@ class ResourceOwnerGrant(GrantHandlerFactory, ScopeGrant, SiteAdapterMixin):
     def __init__(self, unique_token=False, expires_in=0, **kwargs):
         self.unique_token = unique_token
         self.expires_in = expires_in
-
         super(ResourceOwnerGrant, self).__init__(**kwargs)
 
     def __call__(self, request, server):
@@ -819,10 +804,8 @@ class RefreshToken(GrantHandlerFactory, ScopeGrant):
     grant_type = "refresh_token"
 
     def __init__(self, expires_in, reissue_refresh_tokens=False, **kwargs):
-
         self.refresh_expires_in = expires_in
         self.reissue_refresh_tokens = reissue_refresh_tokens
-
         super(RefreshToken, self).__init__(**kwargs)
 
     def __call__(self, request, server):
@@ -959,6 +942,7 @@ class ClientCredentialsGrant(GrantHandlerFactory, ScopeGrant):
                 client_authenticator=server.client_authenticator,
                 scope_handler=self._create_scope_handler(),
                 token_generator=server.token_generator)
+
         return None
 
 

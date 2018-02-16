@@ -2,21 +2,23 @@ import logging
 import os
 import signal
 import sys
-
-from multiprocessing import Process
 from wsgiref.simple_server import make_server
 
 sys.path.insert(0, os.path.abspath(os.path.realpath(__file__) + '/../../../'))
 
 from oauth2 import Provider
 from oauth2.error import UserNotAuthenticated
-from oauth2.web import ImplicitGrantSiteAdapter
-from oauth2.web.wsgi import Application
-from oauth2.tokengenerator import StatelessTokenGenerator
 from oauth2.grant import ImplicitGrant
 from oauth2.store.memory import ClientStore
 from oauth2.store.stateless import TokenStore
+from oauth2.tokengenerator import StatelessTokenGenerator
+from oauth2.web import ImplicitGrantSiteAdapter
+from oauth2.web.wsgi import Application
 
+if sys.version_info >= (3, 0):
+    from multiprocessing import Process
+else:
+    from multiprocessing.process import Process
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -101,8 +103,7 @@ def run_app_server():
 
         start_response("200 OK", [("Content-Type", "text/html")])
 
-        return [js_app]
-
+        return [js_app.encode('utf-8')]
     try:
         httpd = make_server('', 8080, application)
 

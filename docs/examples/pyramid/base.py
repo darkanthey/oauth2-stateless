@@ -1,11 +1,11 @@
-
-import json
-from pyramid.response import Response as PyramidResponse
-from oauth2.web import Response
-from oauth2.error import OAuthInvalidError, \
-    ClientNotFoundError, OAuthInvalidNoRedirectError, UnsupportedGrantError, ParameterMissingError
 from oauth2.client_authenticator import ClientAuthenticator, request_body
+from oauth2.compatibility import json
+from oauth2.error import (ClientNotFoundError, OAuthInvalidError,
+                          OAuthInvalidNoRedirectError, ParameterMissingError,
+                          UnsupportedGrantError)
 from oauth2.tokengenerator import Uuid4TokenGenerator
+from oauth2.web import Response
+from pyramid.response import Response as PyramidResponse
 
 
 class Request():
@@ -32,11 +32,7 @@ class BaseAuthController(object):
         self.client_store = self._get_client_store()
         self.access_token_store = self._get_token_store()
 
-        self.client_authenticator = ClientAuthenticator(
-                                        client_store=self.client_store,
-                                        source=request_body
-                                    )
-
+        self.client_authenticator = ClientAuthenticator(client_store=self.client_store, source=request_body)
         self.grant_types = [];
 
 

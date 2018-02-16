@@ -10,8 +10,12 @@ tokens based on JWT (JSON Web Tokens).
 
 `Documentation <http://oauth2-stateless.readthedocs.org/en/latest/index.html>`_
 
+
 Status
 ******
+
+.. image:: https://travis-ci.org/darkanthey/oauth2-stateless.svg?branch=master
+   :target: https://travis-ci.org/darkanthey/oauth2-stateless
 
 oauth2-stateless has reached its beta phase. All main parts of the `OAuth 2.0 RFC <http://tools.ietf.org/html/rfc6749>`_ such as the various types of Grants, Refresh Token and Scopes have been implemented.
 

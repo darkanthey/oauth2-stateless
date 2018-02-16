@@ -23,18 +23,16 @@ oauth2-stateless is available on
     pip install oauth2-stateless
 """
 
-try:
-    import json
-except ImportError:
-    import ujson as json
-
 from oauth2.client_authenticator import ClientAuthenticator, request_body
-from oauth2.error import OAuthInvalidError, ClientNotFoundError, OAuthInvalidNoRedirectError, UnsupportedGrantError
+from oauth2.compatibility import json
+from oauth2.error import (ClientNotFoundError, OAuthInvalidError,
+                          OAuthInvalidNoRedirectError, UnsupportedGrantError)
+from oauth2.grant import (AuthorizationCodeGrant, ClientCredentialsGrant,
+                          ImplicitGrant, RefreshToken, ResourceOwnerGrant,
+                          Scope)
 from oauth2.log import app_log
-from oauth2.web import Response
 from oauth2.tokengenerator import Uuid4TokenGenerator
-from oauth2.grant import (Scope, AuthorizationCodeGrant, ImplicitGrant, ClientCredentialsGrant,
-                          ResourceOwnerGrant, RefreshToken)
+from oauth2.web import Response
 
 
 class Provider(object):
@@ -71,9 +69,8 @@ class Provider(object):
 
         self.access_token_store = access_token_store
         self.auth_code_store = auth_code_store
-        self.client_authenticator = ClientAuthenticator(
-            client_store=client_store,
-            source=client_authentication_source)
+        self.client_authenticator = ClientAuthenticator(client_store=client_store,
+                                                        source=client_authentication_source)
         self.response_class = response_class
         self.token_generator = token_generator
 
@@ -137,8 +134,7 @@ class Provider(object):
             app_log.error("Uncaught Exception", exc_info=True)
             response = self.response_class()
             return grant_type.handle_error(
-                error=OAuthInvalidError(error="server_error",
-                                        explanation="Internal server error"),
+                error=OAuthInvalidError(error="server_error", explanation="Internal server error"),
                 response=response)
 
     def enable_unique_tokens(self):

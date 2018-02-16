@@ -1,30 +1,28 @@
-try:
-    import json
-except ImportError:
-    import ujson as json
-
 import logging
 import os
 import signal
 import sys
-import urllib
-import urlparse
-
-from multiprocessing.process import Process
+from wsgiref.simple_server import WSGIRequestHandler, make_server
 
 sys.path.insert(0, os.path.abspath(os.path.realpath(__file__) + '/../../../'))
 
 from oauth2 import Provider
+from oauth2.compatibility import json, parse_qs, urlencode
 from oauth2.error import UserNotAuthenticated
 from oauth2.grant import AuthorizationCodeGrant
-from oauth2.tokengenerator import Uuid4TokenGenerator
 from oauth2.store.memory import ClientStore, TokenStore
+from oauth2.tokengenerator import Uuid4TokenGenerator
 from oauth2.web import AuthorizationCodeGrantSiteAdapter
 from oauth2.web.tornado import OAuth2Handler
 from tornado.ioloop import IOLoop
 from tornado.web import Application, url
-from wsgiref.simple_server import make_server, WSGIRequestHandler
 
+if sys.version_info >= (3, 0):
+    from multiprocessing import Process
+    from urllib.request import urlopen
+else:
+    from multiprocessing.process import Process
+    from urllib2 import urlopen
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -69,8 +67,8 @@ class TestSiteAdapter(AuthorizationCodeGrantSiteAdapter):
     """
 
     def render_auth_page(self, request, response, environ, scopes, client):
-        url = request.path + "?" + request.query_string
-        response.body = self.CONFIRMATION_TEMPLATE.format(url=url)
+        page_url = request.path + "?" + request.query_string
+        response.body = self.CONFIRMATION_TEMPLATE.format(url=page_url)
 
         return response
 
@@ -92,10 +90,10 @@ class ClientApplication(object):
     Very basic application that simulates calls to the API of the
     oauth2-stateless app.
     """
-    callback_url = "http://localhost:8081/callback"
+    callback_url = "http://localhost:8080/callback"
     client_id = "abc"
     client_secret = "xyz"
-    api_server_url = "http://localhost:8080"
+    api_server_url = "http://localhost:8081"
 
     def __init__(self):
         self.access_token = None
@@ -112,9 +110,8 @@ class ClientApplication(object):
             body = ""
             headers = {"Location": "/app"}
 
-        start_response(status,
-                       [(header, val) for header,val in headers.iteritems()])
-        return body
+        start_response(status, [(header, val) for header, val in headers.items()])
+        return [body.encode('utf-8')]
 
     def _request_access_token(self):
         print("Requesting access token...")
@@ -126,13 +123,9 @@ class ClientApplication(object):
                        "redirect_uri": self.callback_url}
         token_endpoint = self.api_server_url + "/token"
 
-        result = urllib.urlopen(token_endpoint,
-                                urllib.urlencode(post_params))
-        content = ""
-        for line in result:
-            content += line
+        token_result = urlopen(token_endpoint, urlencode(post_params).encode('utf-8'))
+        result = json.loads(token_result.read().decode('utf-8'))
 
-        result = json.loads(content)
         self.access_token = result["access_token"]
         self.token_type = result["token_type"]
 
@@ -143,7 +136,7 @@ class ClientApplication(object):
     def _read_auth_token(self, env):
         print("Receiving authorization token...")
 
-        query_params = urlparse.parse_qs(env["QUERY_STRING"])
+        query_params = parse_qs(env["QUERY_STRING"])
 
         if "error" in query_params:
             location = "/app?error=" + query_params["error"][0]
@@ -152,45 +145,39 @@ class ClientApplication(object):
         self.auth_token = query_params["code"][0]
 
         print("Received temporary authorization token '%s'" % (self.auth_token,))
-
         return "302 Found", "", {"Location": "/app"}
 
     def _request_auth_token(self):
         print("Requesting authorization token...")
 
         auth_endpoint = self.api_server_url + "/authorize"
-        query = urllib.urlencode({"client_id": "abc",
-                                  "redirect_uri": self.callback_url,
-                                  "response_type": "code"})
+        query = urlencode({"client_id": "abc",
+                           "redirect_uri": self.callback_url,
+                           "response_type": "code"})
 
         location = "%s?%s" % (auth_endpoint, query)
-
         return "302 Found", "", {"Location": location}
 
     def _serve_application(self, env):
-        query_params = urlparse.parse_qs(env["QUERY_STRING"])
-
-        if ("error" in query_params
-                and query_params["error"][0] == "access_denied"):
+        query_params = parse_qs(env["QUERY_STRING"])
+        if ("error" in query_params and query_params["error"][0] == "access_denied"):
             return "200 OK", "User has denied access", {}
 
         if self.access_token is None:
             if self.auth_token is None:
                 return self._request_auth_token()
-            else:
-                return self._request_access_token()
-        else:
-            confirmation = "Current access token '%s' of type '%s'" % (self.access_token, self.token_type)
-            return "200 OK", str(confirmation), {}
+            return self._request_access_token()
+        confirmation = "Current access token '%s' of type '%s'" % (self.access_token, self.token_type)
+        return "200 OK", str(confirmation), {}
 
 
 def run_app_server():
     app = ClientApplication()
 
     try:
-        httpd = make_server('', 8081, app, handler_class=ClientRequestHandler)
+        httpd = make_server('', 8080, app, handler_class=ClientRequestHandler)
 
-        print("Starting Client app on http://localhost:8081/...")
+        print("Starting Client app on http://localhost:8080/...")
         httpd.serve_forever()
     except KeyboardInterrupt:
         httpd.server_close()
@@ -198,8 +185,7 @@ def run_app_server():
 
 def run_auth_server():
     client_store = ClientStore()
-    client_store.add_client(client_id="abc", client_secret="xyz",
-                            redirect_uris=["http://localhost:8081/callback"])
+    client_store.add_client(client_id="abc", client_secret="xyz", redirect_uris=["http://localhost:8080/callback"])
 
     token_store = TokenStore()
 
@@ -214,20 +200,18 @@ def run_auth_server():
             url(provider.token_path, OAuth2Handler, dict(provider=provider)),
         ])
 
-        app.listen(8080)
-        print("Starting OAuth2 server on http://localhost:8080/...")
+        app.listen(8081)
+        print("Starting OAuth2 server on http://localhost:8081/...")
         IOLoop.current().start()
-
     except KeyboardInterrupt:
         IOLoop.close()
-
 
 def main():
     auth_server = Process(target=run_auth_server)
     auth_server.start()
     app_server = Process(target=run_app_server)
     app_server.start()
-    print("Access http://localhost:8081/app in your browser")
+    print("Access http://localhost:8080/app in your browser")
 
     def sigint_handler(signal, frame):
         print("Terminating servers...")

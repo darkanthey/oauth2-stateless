@@ -39,8 +39,7 @@ class ExampleSiteAdapter(oauth2.web.AuthorizationCodeGrantSiteAdapter,
 # Create an in-memory storage to store your client apps.
 client_store = oauth2.store.memory.ClientStore()
 # Add a client
-client_store.add_client(client_id="abc", client_secret="xyz",
-                        redirect_uris=["http://localhost/callback"])
+client_store.add_client(client_id="abc", client_secret="xyz", redirect_uris=["http://localhost/callback"])
 
 site_adapter = ExampleSiteAdapter()
 
@@ -60,8 +59,7 @@ provider = oauth2.Provider(
 provider.add_grant(oauth2.grant.AuthorizationCodeGrant(site_adapter=site_adapter))
 provider.add_grant(oauth2.grant.ImplicitGrant(site_adapter=site_adapter))
 
-# Add refresh token capability and set expiration time of access tokens
-# to 30 days
+# Add refresh token capability and set expiration time of access tokens to 30 days
 provider.add_grant(oauth2.grant.RefreshToken(expires_in=2592000))
 
 # Wrap the controller with the Wsgi adapter

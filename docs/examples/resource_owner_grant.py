@@ -1,29 +1,27 @@
-try:
-    import json
-except ImportError:
-    import ujson as json
-
 import logging
 import os
 import signal
 import sys
-import urllib2
-
-from multiprocessing.process import Process
-from urllib2 import HTTPError
 from wsgiref.simple_server import make_server
 
 sys.path.insert(0, os.path.abspath(os.path.realpath(__file__) + '/../../../'))
 
-from oauth2.compatibility import parse_qs, urlencode
 from oauth2 import Provider
+from oauth2.compatibility import json, parse_qs, urlencode
 from oauth2.error import UserNotAuthenticated
+from oauth2.grant import ResourceOwnerGrant
 from oauth2.store.memory import ClientStore, TokenStore
 from oauth2.tokengenerator import Uuid4TokenGenerator
 from oauth2.web import ResourceOwnerGrantSiteAdapter
 from oauth2.web.wsgi import Application
-from oauth2.grant import ResourceOwnerGrant
 
+if sys.version_info >= (3, 0):
+    from multiprocessing import Process
+    from urllib.request import urlopen
+    from urllib.error import HTTPError
+else:
+    from multiprocessing.process import Process
+    from urllib2 import urlopen, HTTPError
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -35,7 +33,7 @@ class ClientApplication(object):
     """
     client_id = "abc"
     client_secret = "xyz"
-    token_endpoint = "http://localhost:8080/token"
+    token_endpoint = "http://localhost:8081/token"
 
     LOGIN_TEMPLATE = """<html>
     <body>
@@ -92,9 +90,8 @@ class ClientApplication(object):
             body = ""
             headers = {"Location": "/"}
 
-        start_response(status,
-                       [(header, val) for header,val in headers.iteritems()])
-        return body
+        start_response(status, [(header, val) for header, val in headers.items()])
+        return [body.encode('utf-8')]
 
     def _display_token(self):
         """
@@ -104,9 +101,7 @@ class ClientApplication(object):
         if self.token is None:
             return "301 Moved", "", {"Location": "/login"}
 
-        return ("200 OK",
-                self.TOKEN_TEMPLATE.format(
-                    access_token=self.token["access_token"]),
+        return ("200 OK", self.TOKEN_TEMPLATE.format(access_token=self.token["access_token"]),
                 {"Content-Type": "text/html"})
 
     def _login(self, failed=False):
@@ -139,24 +134,22 @@ class ClientApplication(object):
         params["client_secret"] = self.client_secret
         # Request an access token by POSTing a request to the auth server.
         try:
-            response = urllib2.urlopen(self.token_endpoint, urlencode(params))
-        except HTTPError, he:
+            token_result = urlopen(self.token_endpoint, urlencode(params).encode('utf-8'))
+            response = token_result.read().decode('utf-8')
+        except HTTPError as he:
             if he.code == 400:
                 error_body = json.loads(he.read())
-                body = self.SERVER_ERROR_TEMPLATE\
-                    .format(error_type=error_body["error"],
-                            error_description=error_body["error_description"])
+                body = self.SERVER_ERROR_TEMPLATE.format(error_type=error_body["error"],
+                                                         error_description=error_body["error_description"])
                 return "400 Bad Request", body, {"Content-Type": "text/html"}
             if he.code == 401:
                 return "302 Found", "", {"Location": "/login?failed=1"}
 
-        self.token = json.load(response)
-
+        self.token = json.loads(response)
         return "301 Moved", "", {"Location": "/"}
 
     def _reset(self):
         self.token = None
-
         return "302 Found", "", {"Location": "/login"}
 
 
@@ -176,9 +169,9 @@ def run_app_server():
     app = ClientApplication()
 
     try:
-        httpd = make_server('', 8081, app)
+        httpd = make_server('', 8080, app)
 
-        print("Starting Client app on http://localhost:8081/...")
+        print("Starting Client app on http://localhost:8080/...")
         httpd.serve_forever()
     except KeyboardInterrupt:
         httpd.server_close()
@@ -187,8 +180,7 @@ def run_app_server():
 def run_auth_server():
     try:
         client_store = ClientStore()
-        client_store.add_client(client_id="abc", client_secret="xyz",
-                                redirect_uris=[])
+        client_store.add_client(client_id="abc", client_secret="xyz", redirect_uris=[])
 
         token_store = TokenStore()
 
@@ -198,15 +190,13 @@ def run_auth_server():
             client_store=client_store,
             token_generator=Uuid4TokenGenerator())
 
-        provider.add_grant(
-            ResourceOwnerGrant(site_adapter=TestSiteAdapter())
-        )
+        provider.add_grant(ResourceOwnerGrant(site_adapter=TestSiteAdapter()))
 
         app = Application(provider=provider)
 
-        httpd = make_server('', 8080, app)
+        httpd = make_server('', 8081, app)
 
-        print("Starting OAuth2 server on http://localhost:8080/...")
+        print("Starting OAuth2 server on http://localhost:8081/...")
         httpd.serve_forever()
     except KeyboardInterrupt:
         httpd.server_close()
@@ -217,7 +207,7 @@ def main():
     auth_server.start()
     app_server = Process(target=run_app_server)
     app_server.start()
-    print("Visit http://localhost:8081/ in your browser")
+    print("Visit http://localhost:8080/ in your browser")
 
     def sigint_handler(signal, frame):
         print("Terminating servers...")

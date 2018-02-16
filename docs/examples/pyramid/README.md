@@ -7,8 +7,3 @@ Integrate the example:
 3. Implement "password_auth" method in OAuth2SiteAdapter.
 4. Modify "_get_token_store" and "_get_client_store" methods in UserAuthController
 5. Add "config.add_route('authenticateUser', '/user/token')"  to "\__init__\.py"
-
-Add new grant-type:
-
-1. Implement auth method like "password_auth" in OAuth2SiteAdapter.
-2. Call "add_grant" on your AuthController

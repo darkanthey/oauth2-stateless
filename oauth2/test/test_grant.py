@@ -3,7 +3,7 @@ from copy import copy
 from mock import Mock, call, patch
 from oauth2 import Provider
 from oauth2.client_authenticator import ClientAuthenticator
-from oauth2.compatibility import quote
+from oauth2.compatibility import json, quote
 from oauth2.datatype import AccessToken, AuthorizationCode, Client
 from oauth2.error import (AccessTokenNotFound, AuthCodeNotFound,
                           OAuthInvalidError, UserIdentifierMissingError,
@@ -22,12 +22,6 @@ from oauth2.web import (AuthorizationCodeGrantSiteAdapter,
                         ImplicitGrantSiteAdapter,
                         ResourceOwnerGrantSiteAdapter, Response)
 from oauth2.web.wsgi import Request
-
-try:
-    import json
-except ImportError:
-    import ujson as json
-
 
 
 def mock_time():

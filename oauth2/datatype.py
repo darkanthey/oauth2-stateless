@@ -43,10 +43,7 @@ class AccessToken(object):
 
         :return: `True` if the token has expired. Otherwise `False`.
         """
-        if self.expires_at is None:
-            return False
-
-        if self.expires_in > 0:
+        if self.expires_at is None or self.expires_in > 0:
             return False
 
         return True
@@ -92,11 +89,7 @@ class Client(object):
         self.identifier = identifier
         self.secret = secret
 
-        if redirect_uris is None:
-            self.redirect_uris = []
-        else:
-            self.redirect_uris = redirect_uris
-
+        self.redirect_uris = redirect_uris if redirect_uris else []
         self._redirect_uri = None
 
     @property

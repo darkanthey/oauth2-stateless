@@ -1,3 +1,5 @@
+.travis.yml
+
 # IDE
 .project
 .pydevproject
@@ -21,3 +23,6 @@ cover/
 Berksfile.lock
 cookbooks/
 Gemfile.lock
+/GPATH
+/GRTAGS
+/GTAGS

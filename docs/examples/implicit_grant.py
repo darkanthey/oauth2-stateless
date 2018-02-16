@@ -2,20 +2,22 @@ import logging
 import os
 import signal
 import sys
-
-from multiprocessing import Process
 from wsgiref.simple_server import make_server
 
 sys.path.insert(0, os.path.abspath(os.path.realpath(__file__) + '/../../../'))
 
 from oauth2 import Provider
 from oauth2.error import UserNotAuthenticated
-from oauth2.web import ImplicitGrantSiteAdapter
-from oauth2.web.wsgi import Application
-from oauth2.tokengenerator import Uuid4TokenGenerator
 from oauth2.grant import ImplicitGrant
 from oauth2.store.memory import ClientStore, TokenStore
+from oauth2.tokengenerator import Uuid4TokenGenerator
+from oauth2.web import ImplicitGrantSiteAdapter
+from oauth2.web.wsgi import Application
 
+if sys.version_info >= (3, 0):
+    from multiprocessing import Process
+else:
+    from multiprocessing.process import Process
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -38,7 +40,6 @@ class TestSiteAdapter(ImplicitGrantSiteAdapter):
         url = request.path + "?" + request.query_string
         # Add check if the user is logged or a redirect to the login page here
         response.body = self.CONFIRMATION_TEMPLATE.format(url=url)
-
         return response
 
     def authenticate(self, request, environ, scopes, client):
@@ -99,9 +100,7 @@ def run_app_server():
         """
 
         start_response("200 OK", [("Content-Type", "text/html")])
-
-        return [js_app]
-
+        return [js_app.encode('utf-8')]
     try:
         httpd = make_server('', 8080, application)
 
@@ -114,8 +113,7 @@ def run_app_server():
 def run_auth_server():
     try:
         client_store = ClientStore()
-        client_store.add_client(client_id="abc", client_secret="xyz",
-                                redirect_uris=["http://localhost:8080/"])
+        client_store.add_client(client_id="abc", client_secret="xyz", redirect_uris=["http://localhost:8080/"])
 
         token_store = TokenStore()
 

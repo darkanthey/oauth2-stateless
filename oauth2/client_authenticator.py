@@ -76,18 +76,15 @@ class ClientAuthenticator(object):
         try:
             client = self.client_store.fetch_by_client_id(client_id)
         except ClientNotFoundError:
-            raise OAuthInvalidError(error="invalid_client",
-                                    explanation="No client could be found")
+            raise OAuthInvalidError(error="invalid_client", explanation="No client could be found")
 
         grant_type = request.post_param("grant_type")
         if client.grant_type_supported(grant_type) is False:
             raise OAuthInvalidError(error="unauthorized_client",
-                                    explanation="The client is not allowed "
-                                                "to use this grant type")
+                                    explanation="The client is not allowed to use this grant type")
 
         if client.secret != client_secret:
-            raise OAuthInvalidError(error="invalid_client",
-                                    explanation="Invalid client credentials")
+            raise OAuthInvalidError(error="invalid_client", explanation="Invalid client credentials")
 
         return client
 
@@ -108,13 +105,11 @@ def request_body(request):
     """
     client_id = request.post_param("client_id")
     if client_id is None:
-        raise OAuthInvalidError(error="invalid_request",
-                                explanation="Missing client identifier")
+        raise OAuthInvalidError(error="invalid_request", explanation="Missing client identifier")
 
     client_secret = request.post_param("client_secret")
     if client_secret is None:
-        raise OAuthInvalidError(error="invalid_request",
-                                explanation="Missing client credentials")
+        raise OAuthInvalidError(error="invalid_request", explanation="Missing client credentials")
 
     return client_id, client_secret
 
@@ -135,15 +130,12 @@ def http_basic_auth(request):
     auth_header = request.header("authorization")
 
     if auth_header is None:
-        raise OAuthInvalidError(error="invalid_request",
-                                explanation="Authorization header is missing")
+        raise OAuthInvalidError(error="invalid_request", explanation="Authorization header is missing")
 
     auth_parts = auth_header.strip().encode("latin1").split(None)
 
     if auth_parts[0].strip().lower() != b'basic':
-        raise OAuthInvalidError(
-            error="invalid_request",
-            explanation="Provider supports basic authentication only")
+        raise OAuthInvalidError(error="invalid_request", explanation="Provider supports basic authentication only")
 
     client_id, client_secret = b64decode(auth_parts[1]).split(b':', 1)
 

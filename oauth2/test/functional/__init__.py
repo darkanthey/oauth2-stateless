@@ -19,8 +19,7 @@ class NoLoggingHandler(WSGIRequestHandler):
 
 
 def store_factory(client_identifier, client_secret, redirect_uris):
-    stores = {"access_token_store": None, "auth_code_store": None,
-              "client_store": None}
+    stores = {"access_token_store": None, "auth_code_store": None, "client_store": None}
 
     database = os.environ.get("DB")
 
@@ -100,14 +99,10 @@ class MongoDbStoreCreator(StoreCreator):
         self.db = client.test_database
 
     def create_access_token_store(self):
-        return oauth2.store.mongodb.AccessTokenStore(
-            collection=self.db["access_tokens"]
-        )
+        return oauth2.store.mongodb.AccessTokenStore(collection=self.db["access_tokens"])
 
     def create_auth_code_store(self):
-        return oauth2.store.mongodb.AuthCodeStore(
-            collection=self.db["auth_codes"]
-        )
+        return oauth2.store.mongodb.AuthCodeStore(collection=self.db["auth_codes"])
 
     def create_client_store(self):
         return oauth2.store.mongodb.ClientStore(collection=self.db["clients"])
@@ -216,21 +211,16 @@ CREATE TABLE IF NOT EXISTS `client_response_types` (
 ENGINE = InnoDB;"""
 
     def initialize(self):
-        self.connection = mysql.connector.connect(host="127.0.0.1",
-                                                  user="root", passwd="",
-                                                  db="testdb")
+        self.connection = mysql.connector.connect(host="127.0.0.1", user="root", passwd="", db="testdb")
 
     def create_access_token_store(self):
-        return oauth2.store.dbapi.mysql.\
-            MysqlAccessTokenStore(connection=self.connection)
+        return oauth2.store.dbapi.mysql.MysqlAccessTokenStore(connection=self.connection)
 
     def create_auth_code_store(self):
-        return oauth2.store.dbapi.mysql.\
-            MysqlAuthCodeStore(connection=self.connection)
+        return oauth2.store.dbapi.mysql.MysqlAuthCodeStore(connection=self.connection)
 
     def create_client_store(self):
-        return oauth2.store.dbapi.mysql.\
-            MysqlClientStore(connection=self.connection)
+        return oauth2.store.dbapi.mysql.MysqlClientStore(connection=self.connection)
 
     def before_create(self):
         # Execute each query on its own instead of one big query.

@@ -1,11 +1,6 @@
-try:
-    import json
-except ImportError:
-    import ujson as json
-
 from mock import Mock
-
 from oauth2 import Provider
+from oauth2.compatibility import json
 from oauth2.error import OAuthInvalidError, OAuthInvalidNoRedirectError
 from oauth2.grant import (AuthorizationCodeGrant, GrantHandler, RefreshToken,
                           ResourceOwnerGrant)
@@ -39,16 +34,12 @@ class ProviderTestCase(unittest.TestCase):
         Provider.add_grant() should set the expiration time on the instance of TokenGenerator
         """
         self.auth_server.add_grant(
-            AuthorizationCodeGrant(
-                expires_in=400,
-                site_adapter=Mock(spec=AuthorizationCodeGrantSiteAdapter)
-            )
+            AuthorizationCodeGrant(expires_in=400,
+                                   site_adapter=Mock(spec=AuthorizationCodeGrantSiteAdapter))
         )
         self.auth_server.add_grant(
-            ResourceOwnerGrant(
-                expires_in=500,
-                site_adapter=Mock(spec=ResourceOwnerGrantSiteAdapter)
-            )
+            ResourceOwnerGrant(expires_in=500,
+                               site_adapter=Mock(spec=ResourceOwnerGrantSiteAdapter))
         )
         self.auth_server.add_grant(RefreshToken(expires_in=1200))
 
@@ -67,18 +58,14 @@ class ProviderTestCase(unittest.TestCase):
 
         grant_factory_mock = Mock(return_value=grant_handler_mock)
 
-        self.auth_server.site_adapter = Mock(
-            spec=AuthorizationCodeGrantSiteAdapter
-        )
+        self.auth_server.site_adapter = Mock(spec=AuthorizationCodeGrantSiteAdapter)
+
         self.auth_server.add_grant(grant_factory_mock)
         result = self.auth_server.dispatch(request_mock, environ)
 
         grant_factory_mock.assert_called_with(request_mock, self.auth_server)
-        grant_handler_mock.read_validate_params.\
-            assert_called_with(request_mock)
-        grant_handler_mock.process.assert_called_with(request_mock,
-                                                      self.response_mock,
-                                                      environ)
+        grant_handler_mock.read_validate_params.assert_called_with(request_mock)
+        grant_handler_mock.process.assert_called_with(request_mock, self.response_mock, environ)
         self.assertEqual(result, process_result)
 
     def test_dispatch_no_grant_type_found(self):

@@ -2,17 +2,11 @@
 import time
 
 import redis
-
+from oauth2.compatibility import json
 from oauth2.datatype import AccessToken, AuthorizationCode, Client
 from oauth2.error import (AccessTokenNotFound, AuthCodeNotFound,
                           ClientNotFoundError)
 from oauth2.store import AccessTokenStore, AuthCodeStore, ClientStore
-
-try:
-    import json
-except ImportError:
-    import ujson as json
-
 
 
 class RedisStore(object):
@@ -38,7 +32,6 @@ class RedisStore(object):
 
     def delete(self, name):
         cache_key = self._generate_cache_key(name)
-
         self.rs.delete(cache_key)
 
     def write(self, name, data):
@@ -51,7 +44,6 @@ class RedisStore(object):
 
     def read(self, name):
         cache_key = self._generate_cache_key(name)
-
         data = self.rs.get(cache_key)
 
         if data is None:
@@ -108,9 +100,7 @@ class TokenStore(AccessTokenStore, AuthCodeStore, RedisStore):
         """
         self.write(access_token.token, access_token.__dict__)
 
-        unique_token_key = self._unique_token_key(access_token.client_id,
-                                                  access_token.grant_type,
-                                                  access_token.user_id)
+        unique_token_key = self._unique_token_key(access_token.client_id, access_token.grant_type, access_token.user_id)
         self.write(unique_token_key, access_token.__dict__)
 
         if access_token.refresh_token is not None:
@@ -135,9 +125,7 @@ class TokenStore(AccessTokenStore, AuthCodeStore, RedisStore):
         return AccessToken(**token_data)
 
     def fetch_existing_token_of_user(self, client_id, grant_type, user_id):
-        unique_token_key = self._unique_token_key(client_id=client_id,
-                                                  grant_type=grant_type,
-                                                  user_id=user_id)
+        unique_token_key = self._unique_token_key(client_id=client_id, grant_type=grant_type, user_id=user_id)
         token_data = self.read(unique_token_key)
 
         if token_data is None:

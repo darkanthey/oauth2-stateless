@@ -6,6 +6,7 @@ from wsgiref.simple_server import WSGIRequestHandler, make_server
 
 sys.path.insert(0, os.path.abspath(os.path.realpath(__file__) + '/../../../'))
 
+from flask import Flask
 from oauth2 import Provider
 from oauth2.compatibility import json, parse_qs, urlencode
 from oauth2.error import UserNotAuthenticated
@@ -13,7 +14,8 @@ from oauth2.grant import AuthorizationCodeGrant
 from oauth2.store.memory import ClientStore, TokenStore
 from oauth2.tokengenerator import Uuid4TokenGenerator
 from oauth2.web import AuthorizationCodeGrantSiteAdapter
-from oauth2.web.wsgi import Application
+from oauth2.web.flask import oauth_request_hook
+from flask import render_template_string
 
 if sys.version_info >= (3, 0):
     from multiprocessing import Process
@@ -35,39 +37,20 @@ class ClientRequestHandler(WSGIRequestHandler):
         return "client app"
 
 
-class OAuthRequestHandler(WSGIRequestHandler):
-    """
-    Request handler that enables formatting of the log messages on the console.
-
-    This handler is used by the oauth2-stateless application.
-    """
-    def address_string(self):
-        return "oauth2-stateless"
-
-
 class TestSiteAdapter(AuthorizationCodeGrantSiteAdapter):
     """
     This adapter renders a confirmation page so the user can confirm the auth
     request.
     """
 
-    CONFIRMATION_TEMPLATE = """
-<html>
-    <body>
-        <p>
-            <a href="{url}&confirm=1">confirm</a>
-        </p>
-        <p>
-            <a href="{url}&confirm=0">deny</a>
-        </p>
-    </body>
-</html>
-    """
-
     def render_auth_page(self, request, response, environ, scopes, client):
-        url = request.path + "?" + request.query_string
-        response.body = self.CONFIRMATION_TEMPLATE.format(url=url)
-
+        confirmation_template = """
+            <p><a href="{{ url }}&confirm=1">confirm</a></p>
+            <p><a href="{{ url }}&confirm=0">deny</a></p>
+        """
+        page_url = request.path + "?" + request.query_string
+        main_login_body = render_template_string(confirmation_template, url=page_url)
+        response.body = main_login_body
         return response
 
     def authenticate(self, request, environ, scopes, client):
@@ -81,6 +64,9 @@ class TestSiteAdapter(AuthorizationCodeGrantSiteAdapter):
             if request.get_param("confirm") == "0":
                 return True
         return False
+
+    def token(self):
+        pass
 
 
 class ClientApplication(object):
@@ -119,6 +105,7 @@ class ClientApplication(object):
                        "code": self.auth_token,
                        "grant_type": "authorization_code",
                        "redirect_uri": self.callback_url}
+
         token_endpoint = self.api_server_url + "/token"
 
         token_result = urlopen(token_endpoint, urlencode(post_params).encode('utf-8'))
@@ -143,36 +130,29 @@ class ClientApplication(object):
         self.auth_token = query_params["code"][0]
 
         print("Received temporary authorization token '%s'" % (self.auth_token,))
-
         return "302 Found", "", {"Location": "/app"}
 
     def _request_auth_token(self):
         print("Requesting authorization token...")
 
         auth_endpoint = self.api_server_url + "/authorize"
-        query = urlencode({"client_id": "abc",
-                           "redirect_uri": self.callback_url,
-                           "response_type": "code"})
+        query = urlencode({"client_id": "abc", "redirect_uri": self.callback_url, "response_type": "code"})
 
         location = "%s?%s" % (auth_endpoint, query)
-
         return "302 Found", "", {"Location": location}
 
     def _serve_application(self, env):
         query_params = parse_qs(env["QUERY_STRING"])
-
-        if ("error" in query_params
-                and query_params["error"][0] == "access_denied"):
+        if "error" in query_params and query_params["error"][0] == "access_denied":
             return "200 OK", "User has denied access", {}
 
         if self.access_token is None:
             if self.auth_token is None:
                 return self._request_auth_token()
-            else:
-                return self._request_access_token()
+            return self._request_access_token()
         else:
             confirmation = "Current access token '%s' of type '%s'" % (self.access_token, self.token_type)
-            return "200 OK", str(confirmation), {}
+            return "200 OK", confirmation, {}
 
 
 def run_app_server():
@@ -188,31 +168,26 @@ def run_app_server():
 
 
 def run_auth_server():
-    try:
-        client_store = ClientStore()
-        client_store.add_client(client_id="abc", client_secret="xyz",
-                                redirect_uris=["http://localhost:8080/callback"])
+    client_store = ClientStore()
+    client_store.add_client(client_id="abc", client_secret="xyz", redirect_uris=["http://localhost:8080/callback"])
 
-        token_store = TokenStore()
+    token_store = TokenStore()
+    site_adapter = TestSiteAdapter()
 
-        provider = Provider(
-            access_token_store=token_store,
-            auth_code_store=token_store,
-            client_store=client_store,
-            token_generator=Uuid4TokenGenerator())
-        provider.add_grant(
-            AuthorizationCodeGrant(site_adapter=TestSiteAdapter())
-        )
+    provider = Provider(access_token_store=token_store,
+                        auth_code_store=token_store, client_store=client_store,
+                        token_generator=Uuid4TokenGenerator())
+    provider.add_grant(AuthorizationCodeGrant(site_adapter=site_adapter))
 
-        app = Application(provider=provider)
+    app = Flask(__name__)
 
-        httpd = make_server('', 8081, app, handler_class=OAuthRequestHandler)
+    flask_hook = oauth_request_hook(provider)
+    app.add_url_rule('/authorize', 'authorize', view_func=flask_hook(site_adapter.authenticate),
+                     methods=['GET', 'POST'])
+    app.add_url_rule('/token', 'token', view_func=flask_hook(site_adapter.token), methods=['POST'])
 
-        print("Starting OAuth2 server on http://localhost:8081/...")
-        httpd.serve_forever()
-    except KeyboardInterrupt:
-        httpd.server_close()
-
+    app.run(host='0.0.0.0', port=8081)
+    print("Starting OAuth2 server on http://localhost:8081/...")
 
 def main():
     auth_server = Process(target=run_auth_server)

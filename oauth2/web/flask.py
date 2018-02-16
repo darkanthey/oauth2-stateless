@@ -6,8 +6,6 @@ Classes for handling flask HTTP request/response flow.
 """
 
 from functools import wraps
-from typing import Dict, Optional
-
 from flask import request
 
 
@@ -27,7 +25,7 @@ class Request(object):
 
     @property
     def query_string(self):
-        return self.request.query_string
+        return self.request.query_string.decode('utf-8')
 
     def get_param(self, name, default=None):
         return self.request.args.get(name, default)
@@ -41,14 +39,14 @@ class Request(object):
         return self.request.headers.get(name, default)
 
 
-def oauth_request_hook(oauth2_server):
+def oauth_request_hook(provider):
     """Initialise Oauth2 interface bewtween flask and oauth2 server"""
 
     def wrapper(fn):
         @wraps(fn)
         def decorated_fn(*args, **kwargs):
             # We are not call fn(args, kwargs) because oauth.dispatch should doing that.
-            response = oauth2_server.provider.dispatch(Request(request), request.environ)
-            return (response.body, response.status_code, response.headers.items())
+            response = provider.dispatch(Request(request), request.environ)
+            return response.body, response.status_code, response.headers.items()
         return decorated_fn
     return wrapper

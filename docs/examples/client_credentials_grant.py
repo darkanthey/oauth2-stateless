@@ -1,17 +1,20 @@
 import os
-import sys
 import signal
-
-from multiprocessing.process import Process
-from wsgiref.simple_server import make_server, WSGIRequestHandler
+import sys
+from wsgiref.simple_server import WSGIRequestHandler, make_server
 
 sys.path.insert(0, os.path.abspath(os.path.realpath(__file__) + '/../../../'))
 
 from oauth2 import Provider
+from oauth2.grant import ClientCredentialsGrant
 from oauth2.store.memory import ClientStore, TokenStore
 from oauth2.tokengenerator import Uuid4TokenGenerator
 from oauth2.web.wsgi import Application
-from oauth2.grant import ClientCredentialsGrant
+
+if sys.version_info >= (3, 0):
+    from multiprocessing import Process
+else:
+    from multiprocessing.process import Process
 
 
 class OAuthRequestHandler(WSGIRequestHandler):
@@ -27,8 +30,7 @@ class OAuthRequestHandler(WSGIRequestHandler):
 def run_auth_server():
     try:
         client_store = ClientStore()
-        client_store.add_client(client_id="abc", client_secret="xyz",
-                                redirect_uris=[])
+        client_store.add_client(client_id="abc", client_secret="xyz", redirect_uris=[])
 
         token_store = TokenStore()
         token_gen = Uuid4TokenGenerator()
@@ -54,11 +56,8 @@ def main():
     auth_server = Process(target=run_auth_server)
     auth_server.start()
     print("To test getting an auth token, execute the following curl command:")
-    print(
-        "curl --ipv4 -v -X POST"
-        " -d 'grant_type=client_credentials&client_id=abc&client_secret=xyz' "
-        "http://localhost:8080/token"
-    )
+    print("curl --ipv4 -v -X POST -d 'grant_type=client_credentials&client_id=abc&client_secret=xyz' "
+          "http://localhost:8080/token")
 
     def sigint_handler(signal, frame):
         print("Terminating server...")
