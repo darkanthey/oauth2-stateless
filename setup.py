@@ -20,7 +20,7 @@ setup(name="oauth2-stateless",
           "redis": ["redis"]
       },
       classifiers=[
-          "Development Status :: 3 - Alpha",
+          "Development Status :: 3 - Beta",
           "License :: OSI Approved :: MIT License",
           "Programming Language :: Python :: 2",
           "Programming Language :: Python :: 2.7",
@@ -28,5 +28,6 @@ setup(name="oauth2-stateless",
           "Programming Language :: Python :: 3.4",
           "Programming Language :: Python :: 3.5",
           "Programming Language :: Python :: 3.6",
+          "Programming Language :: Python :: 3.7"
       ]
       )

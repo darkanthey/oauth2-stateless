@@ -80,6 +80,7 @@ class ClientApplication(object):
     api_server_url = "http://localhost:8081"
 
     def __init__(self):
+        self.access_token_result = None
         self.access_token = None
         self.auth_token = None
         self.token_type = ""
@@ -111,6 +112,7 @@ class ClientApplication(object):
         token_result = urlopen(token_endpoint, urlencode(post_params).encode('utf-8'))
         result = json.loads(token_result.read().decode('utf-8'))
 
+        self.access_token_result = result
         self.access_token = result["access_token"]
         self.token_type = result["token_type"]
 
@@ -146,13 +148,12 @@ class ClientApplication(object):
         if "error" in query_params and query_params["error"][0] == "access_denied":
             return "200 OK", "User has denied access", {}
 
-        if self.access_token is None:
+        if self.access_token_result is None:
             if self.auth_token is None:
                 return self._request_auth_token()
             return self._request_access_token()
-        else:
-            confirmation = "Current access token '%s' of type '%s'" % (self.access_token, self.token_type)
-            return "200 OK", confirmation, {}
+        confirmation = "Current access token '%s' of type '%s'" % (self.access_token, self.token_type)
+        return "200 OK", confirmation, {}
 
 
 def run_app_server():

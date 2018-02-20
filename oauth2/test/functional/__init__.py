@@ -267,10 +267,10 @@ ENGINE = InnoDB;"""
 
 class RedisStoreCreator(StoreCreator):
     def initialize(self):
-        self.r = redis.StrictRedis(host="localhost", port=6379, db=0)
+        self.redis = redis.StrictRedis(host="localhost", port=6379, db=0)
 
-        self.client_store = oauth2.store.redisdb.ClientStore(rs=self.r)
-        self.token_store = oauth2.store.redisdb.TokenStore(rs=self.r)
+        self.client_store = oauth2.store.redisdb.ClientStore(rs=self.redis)
+        self.token_store = oauth2.store.redisdb.TokenStore(rs=self.redis)
 
     def create_access_token_store(self):
         return self.token_store

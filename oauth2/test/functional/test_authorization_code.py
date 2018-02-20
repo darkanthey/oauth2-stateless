@@ -132,8 +132,8 @@ class AuthorizationCodeTestCase(unittest.TestCase):
 
         provider_started = ready_queue.get()
         if provider_started["result"] != 0:
-            raise Exception("Error starting Provider process with message"
-                            "'{0}'".format(provider_started["error_message"]))
+            raise Exception("Error starting Provider process with "
+                            "message '{0}'".format(provider_started["error_message"]))
 
         self.client = Process(target=run_client, args=(ready_queue,))
         self.client.start()
@@ -288,7 +288,7 @@ class ClientApplication(object):
             print(http_error.read())
             raise
 
-        start_response(status, [(header, val) for header, val in list(headers.items())])
+        start_response(status, [(header, val) for header, val in headers.items()])
         # Be careful with body in PY2 that can be str but in PY3 that should be binary
         return [body.encode('utf-8')]
 
@@ -310,6 +310,7 @@ class ClientApplication(object):
 
     def _read_auth_token(self, env):
         query_params = parse_qs(env["QUERY_STRING"])
+
         self.auth_token = query_params["code"][0]
 
         return "302 Found", "", {"Location": "/app"}
@@ -319,6 +320,7 @@ class ClientApplication(object):
         query = urlencode({"client_id": "abc", "redirect_uri": self.callback_url, "response_type": "code"})
 
         location = "%s?%s" % (auth_endpoint, query)
+
         return "302 Found", "", {"Location": location}
 
     def _serve_application(self):
@@ -326,6 +328,5 @@ class ClientApplication(object):
             if self.auth_token is None:
                 return self._request_auth_token()
             return self._request_access_token()
-        else:
-            # We encode body to binary in ClientApplication
-            return "200 OK", json.dumps(self.access_token_result), {}
+        # We encode body to binary in ClientApplication
+        return "200 OK", json.dumps(self.access_token_result), {}

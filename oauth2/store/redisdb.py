@@ -4,8 +4,7 @@ import time
 import redis
 from oauth2.compatibility import json
 from oauth2.datatype import AccessToken, AuthorizationCode, Client
-from oauth2.error import (AccessTokenNotFound, AuthCodeNotFound,
-                          ClientNotFoundError)
+from oauth2.error import AccessTokenNotFound, AuthCodeNotFound, ClientNotFoundError
 from oauth2.store import AccessTokenStore, AuthCodeStore, ClientStore
 
 
@@ -39,8 +38,12 @@ class RedisStore(object):
 
         expires_at = data.get('expires_at')
         cache_key = self._generate_cache_key(name)
-        token_ttl = int(expires_at) - int(time.time())
-        self.rs.setex(cache_key, json.dumps(data), time=token_ttl)
+
+        if expires_at:
+            token_ttl = int(expires_at) - int(time.time())
+            self.rs.setex(cache_key, token_ttl, json.dumps(data))
+        else:
+            self.rs.set(cache_key, json.dumps(data))
 
     def read(self, name):
         cache_key = self._generate_cache_key(name)
