@@ -5,7 +5,10 @@
 Classes for handling flask HTTP request/response flow.
 """
 
+from __future__ import absolute_import
+
 from functools import wraps
+
 from flask import request
 
 
