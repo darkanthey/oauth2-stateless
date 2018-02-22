@@ -19,7 +19,8 @@ services:
 install:
 - pip install --upgrade setuptools
 - pip install -r requirements.txt
-- if [[ $TRAVIS_PYTHON_VERSION >= 3.5 ]]; then travis_retry pip install aiohttp; fi  
+- if [[ $TRAVIS_PYTHON_VERSION == 3.5 ]]; then travis_retry pip install aiohttp; fi
+- if [[ $TRAVIS_PYTHON_VERSION == 3.6 ]]; then travis_retry pip install aiohttp; fi
 script: make test
 deploy:
   provider: pypi
