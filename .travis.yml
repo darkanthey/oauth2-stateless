@@ -6,7 +6,6 @@ python:
 - 3.4
 - 3.5
 - 3.6
-- 3.7
 env:
 - DB=mongodb
 - DB=mysql
@@ -14,6 +13,10 @@ env:
 before_script:
 - sh -c "if [ '$DB' = 'mysql' ]; then mysql -e 'CREATE DATABASE IF NOT EXISTS testdb;';
   fi"
+script:
+- if python -c "import sys; sys.exit(sys.version_info >= (3, 5, 3))"; then
+      pip install --upgrade aiohttp
+  fi
 services:
 - mongodb
 - redis-server
@@ -29,4 +32,4 @@ deploy:
   on:
     tags: true
     repo: darkanthey/oauth2-stateless
-    condition: $TRAVIS_PYTHON_VERSION = '3.7'
+    condition: $TRAVIS_PYTHON_VERSION = '3.6'

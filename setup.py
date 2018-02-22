@@ -15,7 +15,6 @@ setup(name="oauth2-stateless",
           "itsdangerous"
       ],
       extras_require={
-          ':python_version>="3.5.3"': ["aiohttp"],
           "memcache": ["python-memcached"],
           "mongodb": ["pymongo"],
           "redis": ["redis"]
@@ -28,7 +27,6 @@ setup(name="oauth2-stateless",
           "Programming Language :: Python :: 3",
           "Programming Language :: Python :: 3.4",
           "Programming Language :: Python :: 3.5",
-          "Programming Language :: Python :: 3.6",
-          "Programming Language :: Python :: 3.7"
+          "Programming Language :: Python :: 3.6"
       ]
       )
