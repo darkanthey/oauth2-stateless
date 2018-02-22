@@ -41,7 +41,7 @@ class RedisStore(object):
 
         if expires_at:
             token_ttl = int(expires_at) - int(time.time())
-            self.rs.setex(cache_key, token_ttl, json.dumps(data))
+            self.rs.set(cache_key, json.dumps(data), ex=token_ttl)
         else:
             self.rs.set(cache_key, json.dumps(data))
 

@@ -145,6 +145,56 @@ class AuthorizationCodeTestCase(unittest.TestCase):
 
         self.access_token()
 
+    def test_aiohttp(self):
+        # Minimal versian for aiohttp Python 3.5.3+
+        # otherwise skip this test
+        if sys.version_info < (3, 5, 3):
+            return
+
+        import aiohttp.web
+        from oauth2.web.aiohttp import OAuth2Handler
+
+        def run_provider(queue):
+            try:
+                site_adapter = TestSiteAdapter()
+                provider = create_provider(site_adapter)
+
+                app = aiohttp.web.Application()
+                handler = OAuth2Handler(provider)
+
+                app.router.add_get(provider.authorize_path,
+                                   handler.dispatch_request)
+                app.router.add_post(provider.authorize_path,
+                                    handler.post_dispatch_request)
+                app.router.add_post(provider.token_path,
+                                    handler.post_dispatch_request)
+
+                queue.put({"result": 0})
+
+                aiohttp.web.run_app(app, host='127.0.0.1', port=15486)
+            except Exception as e:
+                queue.put({"result": 1, "error_message": str(e)})
+
+        ready_queue = Queue()
+
+        self.server = Process(target=run_provider, args=(ready_queue,))
+        self.server.start()
+
+        provider_started = ready_queue.get()
+        if provider_started["result"] != 0:
+            raise Exception("Error starting Provider process with "
+                            "message '{0}'".format(provider_started["error_message"]))
+
+        self.client = Process(target=run_client, args=(ready_queue,))
+        self.client.start()
+
+        client_started = ready_queue.get()
+        if client_started["result"] != 0:
+            raise Exception("Error starting Client Application process with "
+                            "message '{0}'".format(client_started["error_message"]))
+
+        self.access_token()
+
     def test_wsgi(self):
         def run_provider(queue):
             try:

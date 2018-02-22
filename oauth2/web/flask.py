@@ -3,6 +3,8 @@
 
 """
 Classes for handling flask HTTP request/response flow.
+
+.. literalinclude:: examples/flask_server.py
 """
 
 from __future__ import absolute_import

@@ -1,40 +1,36 @@
-oauth2-stateless
-#############
+# Oauth2-stateless
 
-oauth2-stateless is a framework that aims at making it easy to provide authentication
-via `OAuth 2.0 <http://tools.ietf.org/html/rfc6749>`_ within an application stack.
+Oauth2-stateless is a framework that aims at making it easy to provide authentication
+via [OAuth 2.0](http://tools.ietf.org/html/rfc6749) within an application stack.
 Main difference of this library is the simplicity
 and the ability to work without any database just with 'stateless'
-tokens based on JWT (JSON Web Tokens).
+tokens based on **JWT** [JSON Web Tokens](https://en.wikipedia.org/wiki/JSON_Web_Token).
+
+[Documentation](http://oauth2-stateless.readthedocs.org/en/latest/index.html)
 
 
-`Documentation <http://oauth2-stateless.readthedocs.org/en/latest/index.html>`_
+# Status
+
+[![Travis Build Status][build-badge]][build]
+[![License](http://img.shields.io/badge/Licence-MIT-brightgreen.svg)](LICENSE)
+
+Oauth2-stateless has reached its beta phase. All main parts of the [OAuth 2.0 RFC](http://tools.ietf.org/html/rfc6749) such as the various types of Grants, Refresh Token and Scopes have been implemented.
 
 
-Status
-******
+# Installation
 
-.. image:: https://travis-ci.org/darkanthey/oauth2-stateless.svg?branch=master
-   :target: https://travis-ci.org/darkanthey/oauth2-stateless
+oauth2-stateless is [available on PyPI](http://pypi.python.org/pypi/oauth2-stateless/)
 
-oauth2-stateless has reached its beta phase. All main parts of the `OAuth 2.0 RFC <http://tools.ietf.org/html/rfc6749>`_ such as the various types of Grants, Refresh Token and Scopes have been implemented.
-
-Installation
-************
-
-oauth2-stateless is available on
-`PyPI <http://pypi.python.org/pypi/oauth2-stateless/>`_.
-
-    pip install oauth2-stateless
+``` bash
+pip install oauth2-stateless
+```
 
 
-Usage
-*****
+# Usage
 
-Example Authorization server
+## Example Authorization server
 
-.. code-block:: python
-
+``` python
     from wsgiref.simple_server import make_server
     import oauth2
     import oauth2.grant
@@ -111,14 +107,17 @@ Example Authorization server
     if __name__ == "__main__":
         httpd = make_server('', 8080, app)
         httpd.serve_forever()
-
+```
 
 This example only shows how to instantiate the server.
 It is not a working example as a client app is missing.
-Take a look at the `examples <docs/examples/>`_ directory.
+Take a look at the [examples](docs/examples/) directory.
 
 Or just run this example:
+
+``` bash
 python docs/examples/stateless_client_server.py
+```
 
 This is already a workable example. They can work without database
 because oauth token already contain all the necessary information like
@@ -128,10 +127,9 @@ You can check this param on server site from database. By adding this check to
 /api/me or redefine oauth2.tokengenerator and add specific logic.
 
 
-Supported storage backends
-**************************
+# Supported storage backends
 
-oauth2-stateless does not force you to use a specific database or you
+Oauth2-stateless does not force you to use a specific database or you
 can work without database with stateless token.
 
 It currently supports these storage backends out-of-the-box:
@@ -141,23 +139,35 @@ It currently supports these storage backends out-of-the-box:
 - Redis
 - Memcached
 - Dynamodb
-  
+
 However, you are not not bound to these implementations.
-By adhering to the interface defined by the base classes in ``oauth2.store``,
+By adhering to the interface defined by the base classes in **oauth2.store**,
 you can easily add an implementation of your backend.
 It also is possible to mix different backends and e.g. read data of a client
 from MongoDB while saving all tokens in memcached for fast access.
 
-Take a look at the examples in the *examples* directory of the project.
+Take a look at the examples in the [examples](docs/examples/) directory of the project.
 
 
-Site adapter
-************
+# Site adapter
 
-- tornado
+- aiohttp
 - flask
+- tornado
 - uwsgi
-  
+
 Like for storage, oauth2-stateless does not define how you identify a
 user or show a confirmation dialogue.
-Instead your application should use the API defined by ``oauth2.web.SiteAdapter``.
+Instead your application should use the API defined by _oauth2.web.SiteAdapter_.
+
+
+# Contributors
+
+[<img alt="DarkAnthey" src="https://avatars2.githubusercontent.com/u/200977?v=3&s=117" width="117">](https://github.com/darkanthey) |
+:---:
+|[DarkAnthey](https://github.com/darkanthey)|
+
+[build-badge]: https://travis-ci.org/darkanthey/oauth2-stateless.svg?branch=master
+[build]: https://travis-ci.org/darkanthey/oauth2-stateless.svg?branch=master
+[license-badge]: https://img.shields.io/badge/license-MIT-blue.svg?style=flat
+[license]: https://github.com/darkanthey/oauth2-stateless/blob/master/LICENSE

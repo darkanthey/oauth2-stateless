@@ -26,3 +26,6 @@ Gemfile.lock
 /GPATH
 /GRTAGS
 /GTAGS
+/TAGS
+/cscope.files
+/cscope.out

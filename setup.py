@@ -3,9 +3,9 @@ import os
 from setuptools import setup
 
 setup(name="oauth2-stateless",
-      version='1.0.3',
+      version='1.1.0',
       description="OAuth 2.0 provider for python with Stateless tokens support",
-      long_description=open("README.rst").read(),
+      long_description=open("README.md").read(),
       author="Andrew Grytsenko",
       author_email="darkanthey@gmail.com",
       url="https://github.com/darkanthey/oauth2-stateless",
@@ -15,6 +15,7 @@ setup(name="oauth2-stateless",
           "itsdangerous"
       ],
       extras_require={
+          ':python_version>="3.5.3"': ["aiohttp"],
           "memcache": ["python-memcached"],
           "mongodb": ["pymongo"],
           "redis": ["redis"]
