@@ -346,7 +346,7 @@ class AccessTokenMixin(object):
             access_token.expires_at = expires_at
             access_token.refresh_token = token_data["refresh_token"]
             refresh_expires_in = self.token_generator.refresh_expires_in
-            refresh_expires_at = int(time.time()) + refresh_expires_in
+            refresh_expires_at = int(time.time()) + refresh_expires_in if refresh_expires_in else refresh_expires_in
             access_token.refresh_expires_at = refresh_expires_at
 
         self.access_token_store.save_token(access_token)
@@ -805,7 +805,7 @@ class RefreshToken(GrantHandlerFactory, ScopeGrant):
 
     def __init__(self, expires_in, reissue_refresh_tokens=False, **kwargs):
         self.refresh_expires_in = expires_in
-        self.reissue_refresh_tokens = reissue_refresh_tokens
+        self.reissue_refresh_tokens = reissue_refresh_tokens if expires_in else True
         super(RefreshToken, self).__init__(**kwargs)
 
     def __call__(self, request, server):

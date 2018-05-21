@@ -47,6 +47,20 @@ class ProviderTestCase(unittest.TestCase):
         self.assertEqual(self.token_generator_mock.expires_in[ResourceOwnerGrant.grant_type], 500)
         self.assertEqual(self.token_generator_mock.refresh_expires_in, 1200)
 
+    def test_add_grant_set_unexpired_refresh_time(self):
+        """
+        Provider.add_grant() should set the expiration time on the instance of TokenGenerator
+        """
+        self.auth_server.add_grant(
+            ResourceOwnerGrant(expires_in=0,
+                               site_adapter=Mock(spec=ResourceOwnerGrantSiteAdapter))
+        )
+        self.auth_server.add_grant(RefreshToken(expires_in=0))
+
+        self.assertEqual(self.token_generator_mock.expires_in[ResourceOwnerGrant.grant_type], 0)
+        self.assertEqual(self.token_generator_mock.refresh_expires_in, 0)
+
+
     def test_dispatch(self):
         environ = {"session": "data"}
         process_result = "response"
