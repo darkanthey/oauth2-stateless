@@ -15,10 +15,8 @@ from oauth2.tokengenerator import StatelessTokenGenerator
 from oauth2.web import ImplicitGrantSiteAdapter
 from oauth2.web.wsgi import Application
 
-if sys.version_info >= (3, 0):
-    from multiprocessing import Process
-else:
-    from multiprocessing.process import Process
+from multiprocessing import Process
+
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -45,9 +43,11 @@ class TestSiteAdapter(ImplicitGrantSiteAdapter):
         return response
 
     def authenticate(self, request, environ, scopes, client):
+        example_user_id = 123
+        example_ext_data = {}
         if request.method == "GET":
             if request.get_param("confirm") == "1":
-                return
+                return example_ext_data, example_user_id
         raise UserNotAuthenticated
 
     def user_has_denied_access(self, request):

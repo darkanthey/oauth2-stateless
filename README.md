@@ -58,8 +58,11 @@ pip install oauth2-stateless
 
         def authenticate(self, request, environ, scopes, client):
             # Check if the user has granted access
+            example_user_id = 123
+            example_ext_data = {}
+
             if request.post_param("confirm") == "confirm":
-                return {}
+                return example_ext_data, example_user_id
 
             raise oauth2.error.UserNotAuthenticated
 

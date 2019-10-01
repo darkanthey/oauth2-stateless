@@ -2,10 +2,10 @@ sudo: false
 language: python
 cache: pip
 python:
-- 2.7
 - 3.4
 - 3.5
 - 3.6
+- 3.7
 env:
 - DB=mongodb
 - DB=mysql
@@ -19,8 +19,7 @@ services:
 install:
 - pip install --upgrade setuptools
 - pip install -r requirements.txt
-- if [[ $TRAVIS_PYTHON_VERSION == 3.5 ]]; then travis_retry pip install aiohttp; fi
-- if [[ $TRAVIS_PYTHON_VERSION == 3.6 ]]; then travis_retry pip install aiohttp; fi
+- pip install -r requirements-dev.txt
 script: make test
 deploy:
   provider: pypi
@@ -30,4 +29,4 @@ deploy:
   on:
     tags: true
     repo: darkanthey/oauth2-stateless
-    condition: $TRAVIS_PYTHON_VERSION = '3.6'
+    condition: $TRAVIS_PYTHON_VERSION = '3.7'

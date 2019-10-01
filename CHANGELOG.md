@@ -1,3 +1,15 @@
+## 1.1.1
+
+Features:
+
+  - Remove PY2 support ([@darkanthey][])
+
+Bugfixes:
+
+  - Fix test DeprecationWarning: Please use assertRegex instead.
+  - Add more example with user_id example.
+  - Add requirements-dev.txt and all datastore and web adapter move there.
+
 ## 1.1.0
 
 Features:
@@ -35,8 +47,7 @@ Bugfixes:
 Features:
 
   - Stateless token support ([@darkanthey][])
-  - Dynamodb token store ([@darkanthey][])  
-  - Support for Python 2.7 - 3.6 ([@darkanthey][])
+  - Dynamodb token store ([@darkanthey][])
+  - Support for Python 2.7 - 3.7 ([@darkanthey][])
 
 [@darkanthey]: https://github.com/darkanthey
-

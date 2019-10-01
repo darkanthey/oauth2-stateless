@@ -11,6 +11,7 @@ import os
 import sys
 import pyramid
 
+
 class OAuth2SiteAdapter(SiteAdapter):
     def authenticate(self, request, environ, scopes):
         if request.method == "POST":
@@ -39,7 +40,7 @@ class OAuth2SiteAdapter(SiteAdapter):
 
 class UserAuthController(BaseAuthController):
     def __init__(self, request):
-        super(UserAuthController, self).__init__(request, OAuth2SiteAdapter())
+        super().__init__(request, OAuth2SiteAdapter())
         self.add_grant(ResourceOwnerGrant(unique_token=True))
 
     @classmethod
@@ -55,4 +56,4 @@ class UserAuthController(BaseAuthController):
     # add this route in __init__.py
     @view_config(route_name="authenticateUser", renderer="json", request_method="POST")
     def authenticate(self):
-        return super(UserAuthController, self).authenticate()
+        return super().authenticate()

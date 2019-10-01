@@ -11,10 +11,7 @@ from oauth2.store.memory import ClientStore, TokenStore
 from oauth2.tokengenerator import Uuid4TokenGenerator
 from oauth2.web.wsgi import Application
 
-if sys.version_info >= (3, 0):
-    from multiprocessing import Process
-else:
-    from multiprocessing.process import Process
+from multiprocessing import Process
 
 
 class OAuthRequestHandler(WSGIRequestHandler):

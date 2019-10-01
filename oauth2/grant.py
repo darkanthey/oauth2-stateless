@@ -178,7 +178,7 @@ class ScopeGrant(object):
         self.scopes = scopes
         self.scope_class = scope_class
 
-        super(ScopeGrant, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
     def _create_scope_handler(self):
         return self.scope_class(available=self.scopes, default=self.default_scope)
@@ -238,7 +238,7 @@ class AuthRequestMixin(object):
         self.scope_handler = scope_handler
         self.token_generator = token_generator
 
-        super(AuthRequestMixin, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
     def read_validate_params(self, request):
         """
@@ -266,7 +266,7 @@ class AuthorizeMixin(object):
 
     def __init__(self, site_adapter, **kwargs):
         self.site_adapter = site_adapter
-        super(AuthorizeMixin, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
     def authorize(self, request, response, environ, scopes):
         """
@@ -312,7 +312,7 @@ class AccessTokenMixin(object):
 
         self.unique_token = unique_token
 
-        super(AccessTokenMixin, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
     def create_token(self, client_id, data, grant_type, scopes, user_id):
         if self.unique_token:
@@ -370,7 +370,7 @@ class SiteAdapterMixin(object):
             )
 
         self.site_adapter = site_adapter
-        super(SiteAdapterMixin, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
 
 class AuthorizationCodeAuthHandler(AuthorizeMixin, AuthRequestMixin, GrantHandler):
@@ -382,7 +382,7 @@ class AuthorizationCodeAuthHandler(AuthorizeMixin, AuthRequestMixin, GrantHandle
 
     def __init__(self, auth_token_store, **kwargs):
         self.auth_code_store = auth_token_store
-        super(AuthorizationCodeAuthHandler, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
     def process(self, request, response, environ):
         """
@@ -453,7 +453,7 @@ class AuthorizationCodeTokenHandler(AccessTokenMixin, GrantHandler):
         self.auth_code_store = auth_token_store
         self.client_authenticator = client_authenticator
 
-        super(AuthorizationCodeTokenHandler, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
     def read_validate_params(self, request):
         """
@@ -552,7 +552,7 @@ class AuthorizationCodeGrant(GrantHandlerFactory, ScopeGrant, SiteAdapterMixin):
         self.unique_token = unique_token
         self.expires_in = expires_in
 
-        super(AuthorizationCodeGrant, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
     def __call__(self, request, server):
         """
@@ -619,7 +619,7 @@ class ImplicitGrant(GrantHandlerFactory, ScopeGrant, SiteAdapterMixin):
 class ImplicitGrantHandler(AuthorizeMixin, AuthRequestMixin, GrantHandler):
     def __init__(self, access_token_store, **kwargs):
         self.access_token_store = access_token_store
-        super(ImplicitGrantHandler, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
     def process(self, request, response, environ):
         data = self.authorize(request, response, environ, self.scope_handler.scopes)
@@ -685,7 +685,7 @@ class ResourceOwnerGrant(GrantHandlerFactory, ScopeGrant, SiteAdapterMixin):
     def __init__(self, unique_token=False, expires_in=0, **kwargs):
         self.unique_token = unique_token
         self.expires_in = expires_in
-        super(ResourceOwnerGrant, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
     def __call__(self, request, server):
         """
@@ -732,7 +732,7 @@ class ResourceOwnerGrantHandler(GrantHandler, AccessTokenMixin):
         self.password = None
         self.username = None
 
-        super(ResourceOwnerGrantHandler, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
     def process(self, request, response, environ):
         """
@@ -806,7 +806,7 @@ class RefreshToken(GrantHandlerFactory, ScopeGrant):
     def __init__(self, expires_in, reissue_refresh_tokens=False, **kwargs):
         self.refresh_expires_in = expires_in
         self.reissue_refresh_tokens = reissue_refresh_tokens if expires_in else True
-        super(RefreshToken, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
     def __call__(self, request, server):
         """

@@ -140,7 +140,7 @@ class Uuid4TokenGeneratorTestCase(unittest.TestCase):
         result = generator.create_access_token_data(data=None, scopes=None, grant_type='test_grant_type',
                                                     user_id=None, client_id=None)
 
-        self.assertRegexpMatches(result["access_token"], self.uuid_regex)
+        self.assertRegex(result["access_token"], self.uuid_regex)
         self.assertEqual(result["token_type"], "Bearer")
 
     def test_create_access_token_data_with_expiration(self):
@@ -151,9 +151,9 @@ class Uuid4TokenGeneratorTestCase(unittest.TestCase):
         result = generator.create_access_token_data(data=None, scopes=None, grant_type='test_grant_type',
                                                     user_id=None, client_id=None)
 
-        self.assertRegexpMatches(result["access_token"], self.uuid_regex)
+        self.assertRegex(result["access_token"], self.uuid_regex)
         self.assertEqual(result["token_type"], "Bearer")
-        self.assertRegexpMatches(result["refresh_token"], self.uuid_regex)
+        self.assertRegex(result["refresh_token"], self.uuid_regex)
         self.assertEqual(result["expires_in"], 600)
 
     def test_generate(self):

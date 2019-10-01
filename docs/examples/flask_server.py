@@ -17,12 +17,9 @@ from oauth2.web import AuthorizationCodeGrantSiteAdapter
 from oauth2.web.flask import oauth_request_hook
 from flask import render_template_string
 
-if sys.version_info >= (3, 0):
-    from multiprocessing import Process
-    from urllib.request import urlopen
-else:
-    from multiprocessing.process import Process
-    from urllib2 import urlopen
+from multiprocessing import Process
+from urllib.request import urlopen
+
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -54,9 +51,11 @@ class TestSiteAdapter(AuthorizationCodeGrantSiteAdapter):
         return response
 
     def authenticate(self, request, environ, scopes, client):
+        example_user_id = 123
+        example_ext_data = {}
         if request.method == "GET":
             if request.get_param("confirm") == "1":
-                return
+                return None, example_user_id
         raise UserNotAuthenticated
 
     def user_has_denied_access(self, request):
@@ -178,7 +177,8 @@ def run_auth_server():
     provider = Provider(access_token_store=token_store,
                         auth_code_store=token_store, client_store=client_store,
                         token_generator=Uuid4TokenGenerator())
-    provider.add_grant(AuthorizationCodeGrant(site_adapter=site_adapter))
+    provider.add_grant(AuthorizationCodeGrant(site_adapter=site_adapter, unique_token=True, expires_in=20))
+    #provider.add_grant(AuthorizationCodeGrant(site_adapter=site_adapter))
 
     app = Flask(__name__)
 

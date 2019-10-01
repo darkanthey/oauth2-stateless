@@ -53,7 +53,7 @@ class OAuthBaseError(Exception):
         self.error_uri = error_uri
         self.explanation = explanation
 
-        super(OAuthBaseError, self).__init__()
+        super().__init__()
 
 
 class OAuthInvalidError(OAuthBaseError):

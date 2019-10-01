@@ -17,12 +17,9 @@ from oauth2.web.tornado import OAuth2Handler
 from tornado.ioloop import IOLoop
 from tornado.web import Application, url
 
-if sys.version_info >= (3, 0):
-    from multiprocessing import Process
-    from urllib.request import urlopen
-else:
-    from multiprocessing.process import Process
-    from urllib2 import urlopen
+from multiprocessing import Process
+from urllib.request import urlopen
+
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -73,9 +70,11 @@ class TestSiteAdapter(AuthorizationCodeGrantSiteAdapter):
         return response
 
     def authenticate(self, request, environ, scopes, client):
+        example_user_id = 123
+        example_ext_data = {}
         if request.method == "GET":
             if request.get_param("confirm") == "1":
-                return
+                return example_ext_data, example_user_id
         raise UserNotAuthenticated
 
     def user_has_denied_access(self, request):

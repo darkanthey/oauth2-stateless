@@ -62,9 +62,11 @@ class TestSiteAdapter(AuthorizationCodeGrantSiteAdapter):
         return response
 
     def authenticate(self, request, environ, scopes, client):
+        example_user_id = 123
+        example_ext_data = {}
         if request.method == "GET":
             if request.get_param("confirm") == "1":
-                return
+                return example_ext_data, example_user_id
         raise UserNotAuthenticated
 
     def user_has_denied_access(self, request):

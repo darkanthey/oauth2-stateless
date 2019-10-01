@@ -19,13 +19,9 @@ from tornado.ioloop import IOLoop
 from tornado.web import Application as TornadoApplication
 from tornado.web import url
 
-if sys.version_info >= (3, 0):
-    from multiprocessing import Process
-    from urllib.request import urlopen
-    from urllib.error import HTTPError
-else:
-    from multiprocessing.process import Process
-    from urllib2 import urlopen, HTTPError
+from multiprocessing import Process
+from urllib.request import urlopen
+from urllib.error import HTTPError
 
 
 def create_provider(site_adapter):
@@ -276,8 +272,8 @@ class AuthorizationCodeTestCase(unittest.TestCase):
 
         self.assertEqual(access_token_data["token_type"], "Bearer")
         self.assertEqual(access_token_data["expires_in"], 120)
-        self.assertRegexpMatches(access_token_data["access_token"], uuid_regex)
-        self.assertRegexpMatches(access_token_data["refresh_token"], uuid_regex)
+        self.assertRegex(access_token_data["access_token"], uuid_regex)
+        self.assertRegex(access_token_data["refresh_token"], uuid_regex)
 
         request_data = {"grant_type": "refresh_token",
                         "refresh_token": access_token_data["refresh_token"],
@@ -289,7 +285,7 @@ class AuthorizationCodeTestCase(unittest.TestCase):
 
         self.assertEqual(refresh_token_data["token_type"], "Bearer")
         self.assertEqual(refresh_token_data["expires_in"], 120)
-        self.assertRegexpMatches(refresh_token_data["access_token"], uuid_regex)
+        self.assertRegex(refresh_token_data["access_token"], uuid_regex)
 
     def tearDown(self):
         if self.client is not None:

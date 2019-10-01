@@ -15,13 +15,10 @@ from oauth2.tokengenerator import Uuid4TokenGenerator
 from oauth2.web import ResourceOwnerGrantSiteAdapter
 from oauth2.web.wsgi import Application
 
-if sys.version_info >= (3, 0):
-    from multiprocessing import Process
-    from urllib.request import urlopen
-    from urllib.error import HTTPError
-else:
-    from multiprocessing.process import Process
-    from urllib2 import urlopen, HTTPError
+from multiprocessing import Process
+from urllib.request import urlopen
+from urllib.error import HTTPError
+
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -155,12 +152,14 @@ class ClientApplication(object):
 
 class TestSiteAdapter(ResourceOwnerGrantSiteAdapter):
     def authenticate(self, request, environ, scopes, client):
+        example_user_id = 123
+        example_ext_data = {}
         username = request.post_param("username")
         password = request.post_param("password")
         # A real world application could connect to a database, try to
         # retrieve username and password and compare them against the input
         if username == "foo" and password == "bar":
-            return
+            return example_ext_data, example_user_id
 
         raise UserNotAuthenticated
 

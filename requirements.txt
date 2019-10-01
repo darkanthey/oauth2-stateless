@@ -1,12 +1,2 @@
-mock
-nose
 ujson
 itsdangerous == 0.24
-
-pymongo
-python-memcached
-redis
-http://dev.mysql.com/get/Downloads/Connector-Python/mysql-connector-python-1.1.7.tar.gz
-
-tornado
-flask
