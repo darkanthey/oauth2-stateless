@@ -1,3 +1,9 @@
+## 1.1.2
+
+Features:
+
+  - Add python 3.8..3.10 support ([@darkanthey][])
+
 ## 1.1.1
 
 Features:
