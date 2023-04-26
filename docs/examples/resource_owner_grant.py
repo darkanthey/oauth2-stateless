@@ -28,8 +28,8 @@ class ClientApplication(object):
     Very basic application that simulates calls to the API of the
     oauth2-stateless app.
     """
-    client_id = "abc"
-    client_secret = "xyz"
+    client_id = "cba"
+    client_secret = "zyx"
     token_endpoint = "http://localhost:8081/token"
 
     LOGIN_TEMPLATE = """<html>
@@ -179,7 +179,7 @@ def run_app_server():
 def run_auth_server():
     try:
         client_store = ClientStore()
-        client_store.add_client(client_id="abc", client_secret="xyz", redirect_uris=[])
+        client_store.add_client(client_id="cba", client_secret=lambda s: s == 'zyx', redirect_uris=[])
 
         token_store = TokenStore()
 

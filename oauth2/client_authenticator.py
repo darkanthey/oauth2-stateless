@@ -84,6 +84,8 @@ class ClientAuthenticator(object):
                                     explanation="The client is not allowed to use this grant type")
 
         if client.secret != client_secret:
+            if callable(client.secret) and client.secret(client_secret) == True:
+                return client
             raise OAuthInvalidError(error="invalid_client", explanation="Invalid client credentials")
 
         return client
